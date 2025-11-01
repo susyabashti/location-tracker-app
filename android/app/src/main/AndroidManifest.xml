@@ -1,5 +1,20 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Precise GPS location access (required for accurate movement detection within ~10-50 meters) -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Allows location tracking even when the app is in background or killed (critical for 8-second updates & stationary detection) -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+
+    <!-- Enables the background geolocation service to run as a foreground service with a persistent notification -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <!-- Keeps the device awake briefly during location processing in the background to ensure updates aren't missed -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Required on Android 13+ to send local push notifications (e.g., "You haven't moved in 10 minutes!") -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application

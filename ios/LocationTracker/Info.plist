@@ -33,8 +33,26 @@
 		<key>NSAllowsLocalNetworking</key>
 		<true/>
 	</dict>
+	<!-- iOS: When the app is in use (foreground) -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>We’d like to keep an eye on where you are so we can gently nudge you if you’ve been sitting still for a while.</string>
+	<!-- Reason: Explains foreground location use in a friendly way. Required for iOS to show permission prompt. -->
+
+	<!-- iOS: Background + Foreground (iOS 11+) -->
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>We check your location every few seconds—even when the app is closed—so we can let you know if you haven’t moved in over 10 minutes.</string>
+	<!-- Reason: Justifies background tracking. Required on iOS 11+ when requesting "Always" permission. -->
+
+	<!-- iOS: Legacy background (pre-iOS 11) -->
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>We keep watching your location in the background to notice when you’ve been still for too long and send you a friendly reminder.</string>
+	<!-- Reason: Fallback for older iOS versions. Still required even if targeting iOS 11+. -->
+
+	<!-- iOS: Push notifications (local) -->
+	<key>NSUserNotificationUsageDescription</key>
+	<string>We send you a gentle reminder if you haven’t moved in a while.</string>
+	<!-- Reason: Needed for local notifications on iOS 13+ when using UNUserNotificationCenter. -->
+
 	<key>RCTNewArchEnabled</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
