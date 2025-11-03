@@ -1,12 +1,46 @@
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { HomeScreen } from '../AppStack/HomeScreen/HomeScreen';
+import { HomeScreen } from './HomeScreen/HomeScreen';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { CustomTabBar } from '@/components/CustomTabBar/CustomTabBar';
+import { Icon } from '@/components/Icon';
+import { SettingsScreen } from './SettingsScreen/SettingsScreen';
+import { HistoryScreen } from './HistoryScreen/HistoryScreen';
+import type { AppTabParamList } from '@/lib/types/navigation';
 
-const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator<AppTabParamList>();
 
 export const AppStack = () => {
   return (
-    <Stack.Navigator>
-      <Stack.Screen name="Home" component={HomeScreen} />
-    </Stack.Navigator>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+      }}
+      initialRouteName="Home"
+      tabBar={CustomTabBar}
+    >
+      <Tab.Screen
+        name="History"
+        component={HistoryScreen}
+        options={{
+          title: 'History',
+          tabBarIcon: props => <Icon name="History" {...props} />,
+        }}
+      />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          title: 'Home',
+          tabBarIcon: props => <Icon name="House" {...props} />,
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsScreen}
+        options={{
+          title: 'Settings',
+          tabBarIcon: props => <Icon name="Settings" {...props} />,
+        }}
+      />
+    </Tab.Navigator>
   );
 };

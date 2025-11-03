@@ -29,6 +29,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       launchOptions: launchOptions
     )
 
+    // (optional) request provisional permission at launch
+    let options: UNAuthorizationOptions = [.alert, .sound, .badge]
+    UNUserNotificationCenter.current().requestAuthorization(options: options) { granted, _ in
+      if granted {
+        DispatchQueue.main.async {
+          UIApplication.shared.registerForRemoteNotifications()
+        }
+      }
+    }
+
     return true
   }
 }
