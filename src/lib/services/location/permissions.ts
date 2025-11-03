@@ -1,11 +1,4 @@
-import {
-  check,
-  checkNotifications,
-  PERMISSIONS,
-  request,
-  requestNotifications,
-  RESULTS,
-} from 'react-native-permissions';
+import { check, PERMISSIONS, request, RESULTS } from 'react-native-permissions';
 import { showSettingsAlert } from '@helpers/alerts';
 import { Platform } from 'react-native';
 import {
@@ -13,8 +6,6 @@ import {
   ALERT_BACKGROUND_LOCATION_TITLE,
   ALERT_LOCATION_DESC,
   ALERT_LOCATION_TITLE,
-  ALERT_NOTIFICATION_DESC,
-  ALERT_NOTIFICATION_TITLE,
 } from './consts';
 
 export const checkLocationPermissions = async (): Promise<boolean> => {
@@ -109,35 +100,6 @@ export const requestLocationPermission = async () => {
     return false;
   } catch (error) {
     console.warn('Permission request failed:', error);
-    return false;
-  }
-};
-
-export const requestNotificationPermissions = async (): Promise<boolean> => {
-  try {
-    const { status } = await requestNotifications(['alert', 'sound', 'badge']);
-
-    if (status === RESULTS.GRANTED) {
-      return true;
-    }
-
-    if (status === RESULTS.DENIED || status === RESULTS.BLOCKED) {
-      showSettingsAlert(ALERT_NOTIFICATION_TITLE, ALERT_NOTIFICATION_DESC);
-    }
-
-    return false;
-  } catch (error) {
-    console.warn('Notification permission request failed:', error);
-    return false;
-  }
-};
-
-export const checkNotificationPermissions = async (): Promise<boolean> => {
-  try {
-    const { status } = await checkNotifications();
-    return status === RESULTS.GRANTED;
-  } catch (error) {
-    console.warn('Failed to check notification permissions:', error);
     return false;
   }
 };

@@ -1,8 +1,9 @@
 import Geolocation from 'react-native-geolocation-service';
 import notifee, { AndroidImportance } from '@notifee/react-native';
-import { locationStore } from './storage';
 import BackgroundService from 'react-native-background-actions';
 import { Platform } from 'react-native';
+import { settingsStore } from '@/lib/storage/settings';
+import { locationStore } from '@/lib/storage/location';
 
 const TRACKING_TASK_OPTIONS = {
   taskName: 'LocationTracking',
@@ -66,7 +67,7 @@ export const iosLocationTracking = async (interval: number) => {
 };
 
 export const startLocationTracking = async () => {
-  const { settings } = locationStore.getState();
+  const { settings } = settingsStore.getState();
   const interval = settings.interval * 1000;
 
   if (Platform.OS === 'ios') {
@@ -96,7 +97,6 @@ export const stopLocationTracking = async () => {
 };
 
 export const trackLocation = (position: Geolocation.GeoPosition) => {
-  const state = locationStore.getState();
   const {
     lastLocation,
     addLocation,
@@ -105,8 +105,8 @@ export const trackLocation = (position: Geolocation.GeoPosition) => {
     resetStationary,
     setHasSentNotification,
     hasSentNotification,
-    settings,
-  } = state;
+  } = locationStore.getState();
+  const { settings } = settingsStore.getState();
 
   const { latitude, longitude } = position.coords;
   const now = Date.now();

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import {
   Gesture,
@@ -15,7 +15,6 @@ import Animated, {
 import { Icon } from '@/components/Icon';
 import { Text } from '@/components/ui/text';
 import { timeAgo } from '@/lib/helpers/time';
-import { useLocationStore } from '@/lib/services/location/storage';
 import { Separator } from '@/components/ui/separator';
 import { openInMaps } from '@/lib/helpers/maps';
 import { scheduleOnRN } from 'react-native-worklets';
@@ -26,15 +25,11 @@ const ROW_HEIGHT = 80;
 const OPEN_THRESHOLD = ACTION_WIDTH * 0.7; // need clear swipe
 const CLOSE_THRESHOLD = ACTION_WIDTH * 0.4; // less sensitive when returning
 
-const deleteWorklet = (
-  id: string,
-  height: SharedValue<number>,
-  removeLocation: (id: string) => void,
-) => {
+const deleteWorklet = (height: SharedValue<number>, onDelete: () => void) => {
   'worklet';
   height.value = withTiming(0, { duration: 250 }, finished => {
     if (finished) {
-      scheduleOnRN(removeLocation, id);
+      scheduleOnRN(onDelete);
     }
   });
 };
@@ -45,6 +40,7 @@ type Props = {
   timestamp: number;
   id: string;
   onEdit: () => void;
+  onDelete: () => void;
 };
 
 export const SwipeableLocationItem = ({
@@ -53,10 +49,10 @@ export const SwipeableLocationItem = ({
   timestamp,
   id,
   onEdit,
+  onDelete,
 }: Props) => {
   const translateX = useSharedValue(0);
   const height = useSharedValue(ROW_HEIGHT);
-  const removeLocation = useLocationStore.use.deleteLocation();
   const { openRowId, setOpenRowId } = useOpenRow();
 
   useEffect(() => {
@@ -71,7 +67,7 @@ export const SwipeableLocationItem = ({
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteWorklet(id, height, removeLocation),
+        onPress: () => deleteWorklet(height, onDelete),
       },
     ]);
   };

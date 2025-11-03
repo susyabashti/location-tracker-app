@@ -12,10 +12,6 @@ type SettingsRowProps = {
   rowProps?: ViewProps;
 };
 
-/**
- * Reusable row for the Settings screen.
- * Pass any component as `control` (Switch, Slider, Button, custom UI…).
- */
 export const SettingsRow = ({
   icon,
   label,

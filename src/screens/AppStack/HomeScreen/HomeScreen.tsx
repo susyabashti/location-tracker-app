@@ -1,10 +1,10 @@
 import { View } from 'react-native';
-import { useLocationStore } from '@services/location/storage';
 import { Text } from '@/components/ui/text';
 import { Icon } from '@/components/Icon';
+import { useSettingsStore } from '@/lib/storage/settings';
 
 export const HomeScreen = () => {
-  const settings = useLocationStore.use.settings();
+  const settings = useSettingsStore.use.settings();
 
   return (
     <View className="flex-1 items-center justify-center bg-background">

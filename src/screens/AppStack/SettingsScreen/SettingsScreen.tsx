@@ -3,16 +3,19 @@ import { Keyboard, TouchableWithoutFeedback, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Haptics from '@mhpdev/react-native-haptics';
 import { Separator } from '@/components/ui/separator';
-import { useLocationStore } from '@/lib/services/location/storage';
 import { Switch } from '@/components/ui/switch';
 import { SettingsRow } from './components/SettingsRow';
 import { Input } from '@/components/ui/input';
 import { useDebounceCallback } from '@/lib/hooks/useDebounce';
+import { useSettingsStore } from '@/lib/storage/settings';
+import { MenuView } from '@react-native-menu/menu';
+import { Text } from '@/components/ui/text';
+import { Pressable } from 'react-native-gesture-handler';
 
 export const SettingsScreen = () => {
   const insets = useSafeAreaInsets();
-  const settings = useLocationStore.use.settings();
-  const updateSettings = useLocationStore.use.updateSettings();
+  const settings = useSettingsStore.use.settings();
+  const updateSettings = useSettingsStore.use.updateSettings();
   const [inputValue, setInputValue] = React.useState(
     settings.interval > 0 ? settings.interval.toString() : '',
   );
@@ -107,6 +110,34 @@ export const SettingsScreen = () => {
                 placeholder="8"
                 onChangeText={onLocationUpdateIntervalChange}
               />
+            }
+          />
+          <Separator />
+          <SettingsRow
+            icon="Palette"
+            label="Theme"
+            nativeID="app-theme-state"
+            control={
+              <View>
+                <MenuView
+                  title="Select theme"
+                  onPressAction={({ nativeEvent }) => {
+                    const newTheme = nativeEvent.event;
+                    updateSettingWithFeedback({
+                      theme: newTheme as typeof settings.theme,
+                    });
+                  }}
+                  actions={[
+                    { id: 'light', title: 'Light' },
+                    { id: 'dark', title: 'Dark' },
+                    { id: 'system', title: 'System' },
+                  ]}
+                >
+                  <Pressable>
+                    <Text className="capitalize">{settings.theme}</Text>
+                  </Pressable>
+                </MenuView>
+              </View>
             }
           />
         </View>

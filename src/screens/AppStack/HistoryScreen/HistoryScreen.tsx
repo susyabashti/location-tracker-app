@@ -1,23 +1,28 @@
 import React from 'react';
-import { useLocationStore } from '@/lib/services/location/storage';
 import { View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SwipeableLocationItem } from './components/SwipeableLocationItem';
 import { useNavigation } from '@react-navigation/native';
 import { SwipeableListProvider } from './components/SwipeableListProvider';
+import { useLocationStore } from '@/lib/storage/location';
 
 export const HistoryScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const locations = useLocationStore.use.locations();
+  const deleteLocation = useLocationStore.use.deleteLocation();
 
-  const handleEditPress = async (
+  const handleEdit = async (
     id: string,
     latitude: number,
     longitude: number,
   ) => {
     navigation.navigate('EditModal', { id, latitude, longitude });
+  };
+
+  const handleDelete = async (id: string) => {
+    deleteLocation(id);
   };
 
   return (
@@ -35,9 +40,8 @@ export const HistoryScreen = () => {
               latitude={item.latitude}
               longitude={item.longitude}
               timestamp={item.timestamp}
-              onEdit={() =>
-                handleEditPress(item.id, item.latitude, item.longitude)
-              }
+              onEdit={() => handleEdit(item.id, item.latitude, item.longitude)}
+              onDelete={() => handleDelete(item.id)}
             />
           )}
         />

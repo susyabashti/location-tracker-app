@@ -12,6 +12,7 @@
   "dependencies": {
     "@mhpdev/react-native-haptics": "1.0.1",
     "@notifee/react-native": "9.1.8",
+    "@react-native-menu/menu": "2.0.0",
     "@react-navigation/bottom-tabs": "7.7.2",
     "@react-navigation/elements": "2.8.0",
     "@react-navigation/native": "7.1.19",

@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Text } from '@/components/ui/text';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { RootStackScreenProps } from '@/lib/types/navigation';
-import { useLocationStore } from '@/lib/services/location/storage';
+import { useLocationStore } from '@/lib/storage/location';
 
 export const EditModalScreen = ({
   navigation,
