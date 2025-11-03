@@ -22,6 +22,10 @@ type Settings = {
 
 type StoreActions = {
   addLocation: (loc: Omit<Location, 'id'>) => void;
+  updateLocation: (
+    id: string,
+    coordinates: Pick<Location, 'longitude' | 'latitude'>,
+  ) => void;
   updateSettings: (settings: Partial<Settings>) => void;
   clearLocations: () => void;
   deleteLocation: (id: string) => void;
@@ -68,6 +72,20 @@ export const locationStore = create<LocationStore>()(
           return { locations: updated, lastLocation: newLoc };
         }),
 
+      updateLocation: (id, coordinates) =>
+        set(state => {
+          const updatedLocations = state.locations.map(loc => {
+            if (loc.id != id) return loc;
+
+            return {
+              ...loc,
+              latitude: coordinates.latitude,
+              longitude: coordinates.longitude,
+            };
+          });
+
+          return { locations: updatedLocations };
+        }),
       updateSettings: newSettings =>
         set(state => {
           const updated = { ...state.settings, ...newSettings };

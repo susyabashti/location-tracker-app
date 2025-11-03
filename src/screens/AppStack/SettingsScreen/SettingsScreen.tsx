@@ -57,7 +57,7 @@ export const SettingsScreen = () => {
         className="flex-1 bg-background px-4"
         style={{ paddingTop: insets.top + 16 }}
       >
-        <View className="bg-zinc-900 rounded-3xl p-4 gap-4">
+        <View className="bg-zinc-100 dark:bg-zinc-900 rounded-3xl p-4 gap-4">
           <SettingsRow
             icon="Navigation"
             label="Tracking Enabled"

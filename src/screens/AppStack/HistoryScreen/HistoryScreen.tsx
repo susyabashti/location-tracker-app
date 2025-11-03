@@ -5,6 +5,7 @@ import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SwipeableLocationItem } from './components/SwipeableLocationItem';
 import { useNavigation } from '@react-navigation/native';
+import { SwipeableListProvider } from './components/SwipeableListProvider';
 
 export const HistoryScreen = () => {
   const navigation = useNavigation();
@@ -24,21 +25,23 @@ export const HistoryScreen = () => {
       className="flex-1 bg-background"
       style={{ paddingTop: insets.top + 16 }}
     >
-      <FlashList
-        data={locations}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <SwipeableLocationItem
-            id={item.id}
-            latitude={item.latitude}
-            longitude={item.longitude}
-            timestamp={item.timestamp}
-            onEdit={() =>
-              handleEditPress(item.id, item.latitude, item.longitude)
-            }
-          />
-        )}
-      />
+      <SwipeableListProvider>
+        <FlashList
+          data={locations}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <SwipeableLocationItem
+              id={item.id}
+              latitude={item.latitude}
+              longitude={item.longitude}
+              timestamp={item.timestamp}
+              onEdit={() =>
+                handleEditPress(item.id, item.latitude, item.longitude)
+              }
+            />
+          )}
+        />
+      </SwipeableListProvider>
     </View>
   );
 };

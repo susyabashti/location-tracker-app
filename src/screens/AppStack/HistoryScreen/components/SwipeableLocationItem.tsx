@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import {
   Gesture,
@@ -16,20 +16,15 @@ import { Icon } from '@/components/Icon';
 import { Text } from '@/components/ui/text';
 import { timeAgo } from '@/lib/helpers/time';
 import { useLocationStore } from '@/lib/services/location/storage';
-import { scheduleOnRN } from 'react-native-worklets';
 import { Separator } from '@/components/ui/separator';
 import { openInMaps } from '@/lib/helpers/maps';
+import { scheduleOnRN } from 'react-native-worklets';
+import { useOpenRow } from './SwipeableListProvider';
 
 const ACTION_WIDTH = 80;
 const ROW_HEIGHT = 80;
-
-type Props = {
-  latitude: number;
-  longitude: number;
-  timestamp: number;
-  id: string;
-  onEdit: () => void;
-};
+const OPEN_THRESHOLD = ACTION_WIDTH * 0.7; // need clear swipe
+const CLOSE_THRESHOLD = ACTION_WIDTH * 0.4; // less sensitive when returning
 
 const deleteWorklet = (
   id: string,
@@ -44,6 +39,14 @@ const deleteWorklet = (
   });
 };
 
+type Props = {
+  latitude: number;
+  longitude: number;
+  timestamp: number;
+  id: string;
+  onEdit: () => void;
+};
+
 export const SwipeableLocationItem = ({
   latitude,
   longitude,
@@ -54,6 +57,13 @@ export const SwipeableLocationItem = ({
   const translateX = useSharedValue(0);
   const height = useSharedValue(ROW_HEIGHT);
   const removeLocation = useLocationStore.use.deleteLocation();
+  const { openRowId, setOpenRowId } = useOpenRow();
+
+  useEffect(() => {
+    if (openRowId && openRowId !== id) {
+      translateX.value = withSpring(0);
+    }
+  }, [openRowId]);
 
   const confirmDelete = () => {
     Alert.alert('Delete Location', 'Are you sure you want to delete this?', [
@@ -70,22 +80,25 @@ export const SwipeableLocationItem = ({
     .activeOffsetX([-10, 10])
     .failOffsetY([-10, 10])
     .onUpdate(e => {
-      // Cap the swipe distance for iOS-like feel
       translateX.value = Math.min(
         Math.max(e.translationX, -ACTION_WIDTH),
         ACTION_WIDTH,
       );
     })
     .onEnd(() => {
-      const shouldOpenRight = translateX.value < -ACTION_WIDTH / 2;
-      const shouldOpenLeft = translateX.value > ACTION_WIDTH / 2;
+      const x = translateX.value;
 
-      if (shouldOpenLeft) {
+      if (x > OPEN_THRESHOLD) {
         translateX.value = withSpring(ACTION_WIDTH);
-      } else if (shouldOpenRight) {
+        scheduleOnRN(setOpenRowId, id);
+      } else if (x < -OPEN_THRESHOLD) {
         translateX.value = withSpring(-ACTION_WIDTH);
-      } else {
+        scheduleOnRN(setOpenRowId, id);
+      } else if (Math.abs(x) < CLOSE_THRESHOLD) {
         translateX.value = withSpring(0);
+        scheduleOnRN(setOpenRowId, null);
+      } else {
+        translateX.value = withSpring(x > 0 ? ACTION_WIDTH : -ACTION_WIDTH);
       }
     });
 
@@ -97,27 +110,25 @@ export const SwipeableLocationItem = ({
   return (
     <View>
       <View className="absolute inset-x-0 inset-y-0 flex-row justify-between overflow-hidden">
-        <View className="bg-[#3b82f6] left-0" style={styles.actionContainer}>
-          <Pressable
-            onPress={() => {
-              onEdit();
-            }}
-            style={styles.actionButton}
-          >
+        {/* Left Action */}
+        <View className="bg-[#3b82f6]" style={styles.actionContainer}>
+          <Pressable onPress={onEdit} style={styles.actionButton}>
             <Icon name="Pen" color="white" size={22} />
             <Text style={styles.actionText}>Edit</Text>
           </Pressable>
         </View>
-        <View className="bg-[#ef4444] right-0" style={styles.actionContainer}>
+        {/* Right Action */}
+        <View className="bg-[#ef4444]" style={styles.actionContainer}>
           <Pressable onPress={confirmDelete} style={styles.actionButton}>
             <Icon name="Trash2" color="white" size={22} />
             <Text style={styles.actionText}>Delete</Text>
           </Pressable>
         </View>
       </View>
+
       <GestureDetector gesture={pan}>
         <Animated.View
-          className="flex-1 bg-background justify-center"
+          className="flex-1 bg-background justify-center overflow-hidden"
           style={animatedStyle}
         >
           <View className="flex-row items-center gap-3 p-4">
@@ -133,10 +144,7 @@ export const SwipeableLocationItem = ({
                 {timeAgo(timestamp)}
               </Text>
             </View>
-            <Pressable
-              style={pressed => ({ opacity: !pressed ? 0.5 : 1 })}
-              onPress={() => openInMaps(latitude, longitude)}
-            >
+            <Pressable onPress={() => openInMaps(latitude, longitude)}>
               <Text className="text-blue-500">Show on Map</Text>
             </Pressable>
           </View>
