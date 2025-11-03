@@ -58,7 +58,7 @@ export const locationStore = create<LocationsStore>()(
       clearLocations: () => {
         storage.remove('locations');
         storage.remove('lastLocation');
-        return { locations: [], lastLocation: null };
+        set({ locations: [], lastLocation: null });
       },
       deleteLocation: id =>
         set(state => {
@@ -69,7 +69,7 @@ export const locationStore = create<LocationsStore>()(
       resetStationary: () => {
         storage.remove('stationarySince');
         storage.remove('hasSentNotification');
-        return { stationarySince: null, hasSentNotification: false };
+        set({ stationarySince: null, hasSentNotification: false });
       },
       setHasSentNotification: value => {
         storage.set('hasSentNotification', value.toString());

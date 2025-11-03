@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   Keyboard,
   Platform,
   TouchableWithoutFeedback,
@@ -16,7 +17,8 @@ import { useSettingsStore } from '@/lib/storage/settings';
 import { MenuView } from '@react-native-menu/menu';
 import { Text } from '@/components/ui/text';
 import { Pressable } from 'react-native-gesture-handler';
-import { useColorScheme } from 'nativewind';
+import { SettingsGroup } from './components/SettingsGroup';
+import { useLocationStore } from '@/lib/storage/location';
 
 const themeOptions =
   Platform.OS === 'android'
@@ -31,8 +33,8 @@ const themeOptions =
       ];
 
 export const SettingsScreen = () => {
-  const { setColorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
+  const resetLocations = useLocationStore.use.clearLocations();
   const settings = useSettingsStore.use.settings();
   const updateSettings = useSettingsStore.use.updateSettings();
   const [inputValue, setInputValue] = React.useState(
@@ -73,13 +75,28 @@ export const SettingsScreen = () => {
     }
   };
 
+  const onResetLocations = () => {
+    Alert.alert(
+      'Reset Locations',
+      'Are you sure you want to reset locations history?',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Reset',
+          style: 'destructive',
+          onPress: () => resetLocations(),
+        },
+      ],
+    );
+  };
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
       <View
-        className="flex-1 bg-background px-4"
+        className="flex-1 bg-background px-4 gap-4"
         style={{ paddingTop: insets.top + 16 }}
       >
-        <View className="bg-zinc-100 dark:bg-zinc-900 rounded-3xl p-4 gap-4">
+        <SettingsGroup>
           <SettingsRow
             icon="Navigation"
             label="Tracking Enabled"
@@ -155,7 +172,14 @@ export const SettingsScreen = () => {
               </View>
             }
           />
-        </View>
+        </SettingsGroup>
+        <SettingsGroup>
+          <SettingsRow
+            icon="Eraser"
+            label="Reset History"
+            onPress={() => onResetLocations()}
+          />
+        </SettingsGroup>
       </View>
     </TouchableWithoutFeedback>
   );

@@ -51,7 +51,6 @@ export const settingsStore = create<SettingsStore>()(
       })),
       merge: (persistedState, currentState) => {
         const parsed = persistedState as SettingsStore;
-        console.log('Merging settings:', parsed);
         return {
           ...currentState,
           settings: { ...INITIAL_SETTINGS, ...parsed.settings },

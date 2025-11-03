@@ -3,7 +3,7 @@ import { NavigationContainer, ThemeProvider } from '@react-navigation/native';
 import { RootStack } from './screens/RootStack/RootStack';
 import { useColorScheme } from 'nativewind';
 import { NAV_THEME } from './lib/theme/theme';
-import { Appearance, Platform, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger } from 'react-native-reanimated';
 import React from 'react';
@@ -25,6 +25,7 @@ export const App = () => {
   const [isAppReady, setAppReady] = React.useState(false);
 
   React.useEffect(() => {
+    console.log('called');
     const initApp = async () => {
       try {
         await settingsStore.persist.rehydrate();
