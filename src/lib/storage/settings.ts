@@ -26,7 +26,7 @@ const INITIAL_SETTINGS: Settings = {
   theme: Platform.OS === 'ios' ? 'system' : 'light',
   interval: 8,
   movementThreshold: 20,
-  stationaryTimeoutSeconds: 20,
+  stationaryTimeoutSeconds: 10 * 60, // 10 minutes
   pushEnabled: true,
   trackingEnabled: true,
 };

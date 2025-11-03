@@ -1,4 +1,3 @@
-```makefile src/Makefile
 .PHONY: help install clean pods install-pods update-pods build-android build-ios run-android run-ios test lint run-dev
 
 # Show available commands
@@ -20,7 +19,7 @@ help:
 install: install-node install-pods
 
 # Clean project builds
-clean: clean-node clean-ios clean-android
+clean-all: clean-node clean-ios clean-android
 
 # Clean Node modules
 clean-node:
@@ -94,4 +93,3 @@ install-node:
 	@echo "Installing Node dependencies..."
 	npm install
 	@echo "Node dependencies installed"
-```

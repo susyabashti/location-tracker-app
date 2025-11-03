@@ -46,17 +46,34 @@ src/
 │   ├── storage/         # Zustand and MMKV for state management
 │   └── theme/           # Theme configuration
 ├── screens/             # App screens and navigation
-└── assets/              # Static assets
+└── assets/              # Static assets (if there were any)
 ```
 
 ## Installation
 
 1. Clone the repository
-2. Install dependencies: `npm install`
-3. Install iOS dependencies: `cd ios && pod install`
+2. Install dependencies: `make install`
+3. Install iOS dependencies: `make pods`
 4. Run the app:
-   - Android: `npm run android`
-   - iOS: `npm run ios`
+   - Android: `make run-android`
+   - iOS: `make run-ios`
+
+## Available Make Commands
+
+- `make install` - Install all dependencies (Node and iOS pods)
+- `make clean-all` - Clean project builds
+- `make clean-node` - Clean project node_modules
+- `make clean-ios` - Clean project iOS build
+- `make clean-android` - Clean project android build
+- `make pods` - Install iOS pods
+- `make install-pods` - Install iOS pods (alias for pods)
+- `make update-pods` - Update iOS pods
+- `make build-android` - Build Android app
+- `make build-ios` - Build iOS app
+- `make run-android` - Run Android app
+- `make run-ios` - Run iOS app
+- `make lint` - Run linter
+- `make run-dev` - Start Metro server with cache reset
 
 ## Configuration
 
@@ -84,3 +101,21 @@ This project follows best practices for React Native development:
 - FlashList for efficient list rendering
 - Proper error handling and logging
 - Clean component structure with hooks
+
+## Makefile Commands
+
+The project uses a Makefile to simplify common development tasks. You can use the following commands:
+
+```bash
+make install     # Install all dependencies
+make clean       # Clean project builds
+make pods        # Install iOS pods
+make update-pods # Update iOS pods
+make build-android # Build Android app
+make build-ios   # Build iOS app
+make run-android # Run Android app
+make run-ios     # Run iOS app
+make test        # Run tests
+make lint        # Run linter
+make run-dev     # Start Metro server with cache reset
+```

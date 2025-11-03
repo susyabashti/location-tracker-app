@@ -1,9 +1,14 @@
 import Geolocation from 'react-native-geolocation-service';
-import notifee, { AndroidImportance } from '@notifee/react-native';
 import BackgroundService from 'react-native-background-actions';
 import { Platform } from 'react-native';
 import { settingsStore } from '@/lib/storage/settings';
 import { locationStore } from '@/lib/storage/location';
+import {
+  cancelNotificationById,
+  sendNotification,
+} from '../notifications/notifications';
+import { STATIONARY_NOTIFICATION_SETTINGS } from './consts';
+import type { NotificationListenerAction } from '../notifications/types';
 
 const TRACKING_TASK_OPTIONS = {
   taskName: 'LocationTracking',
@@ -96,7 +101,7 @@ export const stopLocationTracking = async () => {
   locationStore.getState().resetStationary();
 };
 
-export const trackLocation = (position: Geolocation.GeoPosition) => {
+export const trackLocation = async (position: Geolocation.GeoPosition) => {
   const {
     lastLocation,
     addLocation,
@@ -140,28 +145,17 @@ export const trackLocation = (position: Geolocation.GeoPosition) => {
     return;
   }
 
-  sendStationaryNotification();
-  setHasSentNotification(true);
+  const result = await sendNotification(STATIONARY_NOTIFICATION_SETTINGS);
+  if (result) {
+    setHasSentNotification(true);
+  }
 };
 
-const sendStationaryNotification = async () => {
-  const channelId = await notifee.createChannel({
-    id: 'stationary-alerts',
-    name: 'Stationary Alerts',
-  });
+export const stopTrackingOnPress: NotificationListenerAction = id => {
+  settingsStore.getState().updateSettings({ trackingEnabled: false });
+  stopLocationTracking();
 
-  await notifee.displayNotification({
-    id: 'stop-tracking',
-    title: "Hey, you've been still for a while!",
-    body: 'Tap to stop location tracking.',
-    android: {
-      importance: AndroidImportance.HIGH,
-      channelId: channelId,
-    },
-    ios: {
-      critical: true,
-    },
-  });
+  cancelNotificationById(id);
 };
 
 export const calculateDistance = (

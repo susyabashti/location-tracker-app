@@ -7,76 +7,56 @@ import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { configureReanimatedLogger } from 'react-native-reanimated';
 import React from 'react';
-import { settingsStore, useSettingsStore } from './lib/storage/settings';
-import { locationStore } from './lib/storage/location';
-import { requestLocationPermission } from './lib/services/location/permissions';
-import { requestNotificationPermissions } from './lib/services/notifications/permissions';
+import { useSettingsStore } from './lib/storage/settings';
 import {
   startLocationTracking,
   stopLocationTracking,
 } from './lib/services/location/location';
+import { ColorSchemeProvider } from './lib/providers/ColorSchemeProvider';
+import { useAppInit } from './lib/hooks/useAppInit';
+import { LocationTrackingProvider } from './lib/providers/LocationTrackingProvider';
+import { NotificationsProvider } from './lib/providers/NotificationsProvider';
+import { STATIONARY_NOTIFICATION_CHANNEL } from './lib/services/location/consts';
+import { stationaryNotificationListener } from './lib/services/location/listeners';
 
 // our ui library gives us a warning, for this matter we will ignore it.
 configureReanimatedLogger({ strict: false });
 
 export const App = () => {
-  const { colorScheme, setColorScheme } = useColorScheme();
+  const { colorScheme } = useColorScheme();
+  const { isAppReady } = useAppInit();
   const settings = useSettingsStore.use.settings();
-  const [isAppReady, setAppReady] = React.useState(false);
-
-  React.useEffect(() => {
-    console.log('called');
-    const initApp = async () => {
-      try {
-        await settingsStore.persist.rehydrate();
-        await locationStore.persist.rehydrate();
-        await requestLocationPermission();
-        await requestNotificationPermissions();
-      } catch (err) {
-        console.log('error requesting permissions', err);
-      } finally {
-        setAppReady(true);
-      }
-    };
-
-    initApp();
-  }, [setAppReady]);
-
-  React.useEffect(() => {
-    if (!isAppReady) return;
-
-    setColorScheme(settings.theme);
-  }, [isAppReady, settings.theme, setColorScheme]);
-
-  React.useEffect(() => {
-    if (!isAppReady) return;
-
-    if (!settings.trackingEnabled) {
-      stopLocationTracking();
-      return;
-    }
-
-    startLocationTracking();
-
-    return () => {
-      stopLocationTracking();
-    };
-  }, [isAppReady, settings.trackingEnabled, settings.interval]);
 
   if (!isAppReady) return null;
 
   return (
     <GestureHandlerRootView>
-      <SafeAreaProvider>
-        <ThemeProvider value={NAV_THEME[colorScheme || 'light']}>
-          <StatusBar
-            barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
-          />
-          <NavigationContainer>
-            <RootStack />
-          </NavigationContainer>
-        </ThemeProvider>
-      </SafeAreaProvider>
+      <NotificationsProvider
+        channels={[STATIONARY_NOTIFICATION_CHANNEL]}
+        listeners={[stationaryNotificationListener]}
+      >
+        <LocationTrackingProvider
+          enabled={settings.trackingEnabled}
+          intervalSeconds={settings.interval}
+          onStart={startLocationTracking}
+          onStop={stopLocationTracking}
+        >
+          <ColorSchemeProvider scheme={settings.theme}>
+            <SafeAreaProvider>
+              <ThemeProvider value={NAV_THEME[colorScheme || 'light']}>
+                <StatusBar
+                  barStyle={
+                    colorScheme === 'dark' ? 'light-content' : 'dark-content'
+                  }
+                />
+                <NavigationContainer>
+                  <RootStack />
+                </NavigationContainer>
+              </ThemeProvider>
+            </SafeAreaProvider>
+          </ColorSchemeProvider>
+        </LocationTrackingProvider>
+      </NotificationsProvider>
     </GestureHandlerRootView>
   );
 };
