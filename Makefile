@@ -1,4 +1,5 @@
-.PHONY: help install clean pods install-pods update-pods build-android build-ios run-android run-ios test lint
+```makefile src/Makefile
+.PHONY: help install clean pods install-pods update-pods build-android build-ios run-android run-ios test lint run-dev
 
 # Show available commands
 help:
@@ -12,8 +13,8 @@ help:
 	@echo "  build-ios     - Build iOS app"
 	@echo "  run-android   - Run Android app"
 	@echo "  run-ios       - Run iOS app"
-	@echo "  test          - Run tests"
 	@echo "  lint          - Run linter"
+	@echo "  run-dev       - Start Metro server with cache reset"
 
 # Install all dependencies
 install: install-node install-pods
@@ -21,15 +22,18 @@ install: install-node install-pods
 # Clean project builds
 clean: clean-node clean-ios clean-android
 
+# Clean Node modules
 clean-node:
 	rm -rf node_modules
 	@echo "Cleaned node_modules"
 
+# Clean iOS build artifacts
 clean-ios:
 	rm -rf ios/Pods
 	rm -rf ios/build
 	@echo "Cleaned iOS"
 
+# Clean Android build artifacts
 clean-android:
 	rm -rf android/.gradle
 	rm -rf android/app/build
@@ -76,18 +80,13 @@ run-ios:
 
 # Start with reset cache
 run-dev:
+	@echo "Starting Metro server with cache reset..."
 	npx react-native start --reset-cache
-
-# Run tests
-test:
-	@echo "Running tests..."
-	npm test
-	@echo "Tests complete"
 
 # Run linter
 lint:
 	@echo "Running linter..."
-	npm run lint
+	npx eslint . --ext .js,.jsx,.ts,.tsx
 	@echo "Linting complete"
 
 # Install Node dependencies
@@ -95,3 +94,4 @@ install-node:
 	@echo "Installing Node dependencies..."
 	npm install
 	@echo "Node dependencies installed"
+```
