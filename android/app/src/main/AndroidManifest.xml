@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Always include this permission -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <!-- Precise GPS location access (required for accurate movement detection within ~10-50 meters) -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
@@ -8,6 +11,7 @@
 
     <!-- Enables the background geolocation service to run as a foreground service with a persistent notification -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" /> <!-- Android 14+ -->
 
     <!-- Keeps the device awake briefly during location processing in the background to ensure updates aren't missed -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -38,5 +42,10 @@
             <category android:name="android.intent.category.LAUNCHER" />
         </intent-filter>
       </activity>
+        <service 
+          android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask"
+          android:foregroundServiceType="location"
+        />
+        <service android:name="app.notifee.core.ReceiverService" android:exported="false"/>
     </application>
 </manifest>

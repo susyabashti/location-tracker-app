@@ -2,13 +2,35 @@
   "extends": "@react-native/typescript-config",
   "compilerOptions": {
     "baseUrl": "./",
+    "types": [],
     "paths": {
-      "@services/*": ["src/lib/services/*"],
-      "@storage/*": ["src/lib/storage/*"],
-      "@components/*": ["src/lib/components/*"],
-      "@screens/*": ["src/screens/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@helpers/*": [
+        "src/lib/helpers/*"
+      ],
+      "@services/*": [
+        "src/lib/services/*"
+      ],
+      "@storage/*": [
+        "src/lib/storage/*"
+      ],
+      "@components/*": [
+        "src/components/*"
+      ],
+      "@screens/*": [
+        "src/screens/*"
+      ]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["**/node_modules", "**/Pods"]
+  "include": [
+    "**/*.ts",
+    "**/*.tsx",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/Pods"
+  ]
 }
