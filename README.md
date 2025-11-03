@@ -24,6 +24,7 @@ A lightweight, well-optimized location tracking application built with React Nat
 - **Notification Settings**: Turn push notifications on/off
 - **Sampling Frequency**: Adjust location sampling interval (8 seconds to any value)
 - **Background Tracking**: Configurable background operation
+- **Theme Settings**: Light, dark, or system theme support
 
 ## Technical Stack
 
@@ -33,6 +34,7 @@ A lightweight, well-optimized location tracking application built with React Nat
 - **UI Library**: NativeWind (Tailwind CSS for React Native)
 - **Performance**: FlashList for efficient list rendering
 - **Location Services**: react-native-background-actions, @notifee/react-native
+- **State Management**: Zustand with MMKV storage
 - **Architecture**: Clean component structure with hooks and stores
 
 ## Architecture
@@ -41,22 +43,24 @@ A lightweight, well-optimized location tracking application built with React Nat
 src/
 ├── components/          # Reusable UI components
 ├── lib/                 # Core logic and utilities
+    ├── helpers/         # Helper functions by domains
 │   ├── hooks/           # Custom React hooks
-│   ├── services/        # Location and notification services
-│   ├── storage/         # Zustand and MMKV for state management
+│   ├── providers/       # Context providers
+│   ├── services/        # Business logic services
+│   ├── storage/         # Zustand stores with MMKV persistence
 │   └── theme/           # Theme configuration
-├── screens/             # App screens and navigation
-└── assets/              # Static assets (if there were any)
+├── screens/             # Main application screens
+└── assets/              # Static assets
 ```
 
 ## Installation
 
 1. Clone the repository
 2. Install dependencies: `make install`
-3. Install iOS dependencies: `make pods`
-4. Run the app:
+3. Run the app:
    - Android: `make run-android`
    - iOS: `make run-ios`
+   - Metro: `make run-dev`
 
 ## Available Make Commands
 
@@ -88,34 +92,3 @@ src/
 - **Notification Toggle**: Enable/disable push notifications
 - **Inactivity Detection**: Automatic notification after 10 minutes of inactivity
 - **Notification Handling**: Stops tracking when notification is pressed
-
-## Development
-
-This project follows best practices for React Native development:
-
-- TypeScript for type safety
-- React Navigation for screen management
-- Zustand for state management
-- MMKV for persistent storage
-- NativeWind for styling
-- FlashList for efficient list rendering
-- Proper error handling and logging
-- Clean component structure with hooks
-
-## Makefile Commands
-
-The project uses a Makefile to simplify common development tasks. You can use the following commands:
-
-```bash
-make install     # Install all dependencies
-make clean       # Clean project builds
-make pods        # Install iOS pods
-make update-pods # Update iOS pods
-make build-android # Build Android app
-make build-ios   # Build iOS app
-make run-android # Run Android app
-make run-ios     # Run iOS app
-make test        # Run tests
-make lint        # Run linter
-make run-dev     # Start Metro server with cache reset
-```
