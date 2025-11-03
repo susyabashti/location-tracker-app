@@ -43,10 +43,6 @@ export const RootStack = () => {
       return;
     }
 
-    console.log(
-      'location tracking with frequency seconds of',
-      settings.interval,
-    );
     startLocationTracking();
 
     return () => {

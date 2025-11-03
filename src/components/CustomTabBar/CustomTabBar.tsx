@@ -8,7 +8,7 @@ export function CustomTabBar({
   navigation,
 }: BottomTabBarProps) {
   return (
-    <View className="flex-row bg-white dark:bg-neutral-800 border-t">
+    <View className="flex-row bg-zinc-50 dark:bg-zinc-800">
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const isFocused = state.index === index;

@@ -5,6 +5,10 @@ import { useColorScheme } from 'nativewind';
 import { NAV_THEME } from './lib/theme/theme';
 import { StatusBar } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { configureReanimatedLogger } from 'react-native-reanimated';
+
+// our ui library gives us a warning, for this matter we will ignore it.
+configureReanimatedLogger({ strict: false });
 
 export const App = () => {
   const { colorScheme } = useColorScheme();
