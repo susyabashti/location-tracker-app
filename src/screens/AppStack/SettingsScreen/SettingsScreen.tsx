@@ -1,5 +1,10 @@
 import React from 'react';
-import { Keyboard, TouchableWithoutFeedback, View } from 'react-native';
+import {
+  Keyboard,
+  Platform,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Haptics from '@mhpdev/react-native-haptics';
 import { Separator } from '@/components/ui/separator';
@@ -11,8 +16,22 @@ import { useSettingsStore } from '@/lib/storage/settings';
 import { MenuView } from '@react-native-menu/menu';
 import { Text } from '@/components/ui/text';
 import { Pressable } from 'react-native-gesture-handler';
+import { useColorScheme } from 'nativewind';
+
+const themeOptions =
+  Platform.OS === 'android'
+    ? [
+        { id: 'light', title: 'Light' },
+        { id: 'dark', title: 'Dark' },
+      ]
+    : [
+        { id: 'light', title: 'Light' },
+        { id: 'dark', title: 'Dark' },
+        { id: 'system', title: 'System' },
+      ];
 
 export const SettingsScreen = () => {
+  const { setColorScheme } = useColorScheme();
   const insets = useSafeAreaInsets();
   const settings = useSettingsStore.use.settings();
   const updateSettings = useSettingsStore.use.updateSettings();
@@ -122,16 +141,12 @@ export const SettingsScreen = () => {
                 <MenuView
                   title="Select theme"
                   onPressAction={({ nativeEvent }) => {
-                    const newTheme = nativeEvent.event;
+                    const newTheme = nativeEvent.event as typeof settings.theme;
                     updateSettingWithFeedback({
-                      theme: newTheme as typeof settings.theme,
+                      theme: newTheme,
                     });
                   }}
-                  actions={[
-                    { id: 'light', title: 'Light' },
-                    { id: 'dark', title: 'Dark' },
-                    { id: 'system', title: 'System' },
-                  ]}
+                  actions={themeOptions}
                 >
                   <Pressable>
                     <Text className="capitalize">{settings.theme}</Text>

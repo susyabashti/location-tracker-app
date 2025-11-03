@@ -2,10 +2,12 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { createMMKV } from 'react-native-mmkv';
 import { createSelectors } from '../helpers/zustand';
+import { Platform } from 'react-native';
 
 const storage = createMMKV({ id: 'settings-store' });
 
 export type Settings = {
+  // on android 'system' is not available
   theme: 'dark' | 'light' | 'system';
   interval: number;
   movementThreshold: number;
@@ -20,7 +22,8 @@ type SettingsStore = {
 };
 
 const INITIAL_SETTINGS: Settings = {
-  theme: 'system',
+  // on android 'system' is not available so we set the default to light
+  theme: Platform.OS === 'ios' ? 'system' : 'light',
   interval: 8,
   movementThreshold: 20,
   stationaryTimeoutSeconds: 20,
@@ -48,6 +51,7 @@ export const settingsStore = create<SettingsStore>()(
       })),
       merge: (persistedState, currentState) => {
         const parsed = persistedState as SettingsStore;
+        console.log('Merging settings:', parsed);
         return {
           ...currentState,
           settings: { ...INITIAL_SETTINGS, ...parsed.settings },

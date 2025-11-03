@@ -19,13 +19,21 @@ help:
 install: install-node install-pods
 
 # Clean project builds
-clean:
+clean: clean-node clean-ios clean-android
+
+clean-node:
 	rm -rf node_modules
+	@echo "Cleaned node_modules"
+
+clean-ios:
 	rm -rf ios/Pods
 	rm -rf ios/build
+	@echo "Cleaned iOS"
+
+clean-android:
 	rm -rf android/.gradle
 	rm -rf android/app/build
-	@echo "Cleaned project"
+	@echo "Cleaned Android"
 
 # Install iOS pods
 pods:
@@ -65,6 +73,10 @@ run-ios:
 	@echo "Running iOS app..."
 	npx react-native run-ios
 	@echo "iOS app running"
+
+# Start with reset cache
+run-dev:
+	npx react-native start --reset-cache
 
 # Run tests
 test:

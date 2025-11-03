@@ -59,7 +59,7 @@ export const SwipeableLocationItem = ({
     if (openRowId && openRowId !== id) {
       translateX.value = withSpring(0);
     }
-  }, [openRowId]);
+  }, [openRowId, id, translateX]);
 
   const confirmDelete = () => {
     Alert.alert('Delete Location', 'Are you sure you want to delete this?', [
