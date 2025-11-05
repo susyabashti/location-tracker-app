@@ -10,7 +10,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Haptics from '@mhpdev/react-native-haptics';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
-import { SettingsRow } from './components/SettingsRow';
+import { PressableSettingRow, SettingsRow } from './components/SettingsRow';
 import { Input } from '@/components/ui/input';
 import { useDebounceCallback } from '@/lib/hooks/useDebounce';
 import { useSettingsStore } from '@/lib/storage/settings';
@@ -174,7 +174,7 @@ export const SettingsScreen = () => {
           />
         </SettingsGroup>
         <SettingsGroup>
-          <SettingsRow
+          <PressableSettingRow
             icon="Eraser"
             label="Reset History"
             onPress={() => onResetLocations()}

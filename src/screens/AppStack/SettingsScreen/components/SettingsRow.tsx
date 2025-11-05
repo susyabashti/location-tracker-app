@@ -11,7 +11,6 @@ type SettingsRowProps = {
   nativeID?: string;
   control?: React.ReactNode;
   rowProps?: ViewProps;
-  onPress?: () => void;
 };
 
 export const SettingsRow = ({
@@ -20,19 +19,27 @@ export const SettingsRow = ({
   nativeID,
   control,
   rowProps,
-  onPress,
 }: SettingsRowProps) => {
   const { theme } = useAppTheme();
 
   return (
-    <Pressable onPress={onPress}>
-      <View className="flex-row justify-between items-center" {...rowProps}>
-        <View className="flex-row items-center gap-2">
-          <Icon name={icon} size={20} color={theme.primary} />
-          <Label nativeID={nativeID}>{label}</Label>
-        </View>
-        {control}
+    <View className="flex-row justify-between items-center" {...rowProps}>
+      <View className="flex-row items-center gap-2">
+        <Icon name={icon} size={20} color={theme.primary} />
+        <Label nativeID={nativeID}>{label}</Label>
       </View>
+      {control}
+    </View>
+  );
+};
+
+export const PressableSettingRow = ({
+  onPress,
+  ...props
+}: SettingsRowProps & { onPress?: () => void }) => {
+  return (
+    <Pressable onPress={onPress}>
+      <SettingsRow {...props} />
     </Pressable>
   );
 };
