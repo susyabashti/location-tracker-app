@@ -19,6 +19,7 @@ import { Separator } from '@/components/ui/separator';
 import { openInMaps } from '@/lib/helpers/maps';
 import { scheduleOnRN } from 'react-native-worklets';
 import { useOpenRow } from './SwipeableListProvider';
+import { useRecyclingState } from '@shopify/flash-list';
 
 const ACTION_WIDTH = 80;
 const ROW_HEIGHT = 80;
@@ -43,6 +44,8 @@ type Props = {
   onDelete: () => void;
 };
 
+const AnimatedItem = Animated.createAnimatedComponent(View);
+
 export const SwipeableLocationItem = ({
   latitude,
   longitude,
@@ -51,15 +54,20 @@ export const SwipeableLocationItem = ({
   onEdit,
   onDelete,
 }: Props) => {
+  const [swipeState, setSwipeState] = useRecyclingState(0, [id]);
   const translateX = useSharedValue(0);
   const height = useSharedValue(ROW_HEIGHT);
   const { openRowId, setOpenRowId } = useOpenRow();
 
+  React.useEffect(() => {
+    translateX.value = withSpring(swipeState * ACTION_WIDTH);
+  }, [swipeState, translateX]);
+
   useEffect(() => {
-    if (openRowId && openRowId !== id) {
-      translateX.value = withSpring(0);
+    if (openRowId && openRowId !== id && swipeState !== 0) {
+      setSwipeState(0);
     }
-  }, [openRowId, id, translateX]);
+  }, [openRowId, id, swipeState, setSwipeState]);
 
   const confirmDelete = () => {
     Alert.alert('Delete Location', 'Are you sure you want to delete this?', [
@@ -67,7 +75,9 @@ export const SwipeableLocationItem = ({
       {
         text: 'Delete',
         style: 'destructive',
-        onPress: () => deleteWorklet(height, onDelete),
+        onPress: () => {
+          deleteWorklet(height, onDelete);
+        },
       },
     ]);
   };
@@ -83,29 +93,29 @@ export const SwipeableLocationItem = ({
     })
     .onEnd(() => {
       const x = translateX.value;
+      let target = 0;
 
-      if (x > OPEN_THRESHOLD) {
-        translateX.value = withSpring(ACTION_WIDTH);
-        scheduleOnRN(setOpenRowId, id);
-      } else if (x < -OPEN_THRESHOLD) {
-        translateX.value = withSpring(-ACTION_WIDTH);
-        scheduleOnRN(setOpenRowId, id);
+      if (Math.abs(x) > OPEN_THRESHOLD) {
+        target = x > 0 ? 1 : -1;
       } else if (Math.abs(x) < CLOSE_THRESHOLD) {
-        translateX.value = withSpring(0);
-        scheduleOnRN(setOpenRowId, null);
+        target = 0;
       } else {
-        translateX.value = withSpring(x > 0 ? ACTION_WIDTH : -ACTION_WIDTH);
+        target = x > 0 ? 1 : -1;
       }
+
+      scheduleOnRN(setSwipeState, target);
+      scheduleOnRN(setOpenRowId, target !== 0 ? id : null);
     });
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }],
     height: height.value,
+    opacity: height.value > 20 ? 1 : 0,
   }));
 
   return (
-    <View>
-      <View className="absolute inset-x-0 inset-y-0 flex-row justify-between overflow-hidden">
+    <View className="overflow-hidden">
+      <View className="absolute inset-0 flex-row justify-between">
         {/* Left Action */}
         <View className="bg-[#3b82f6]" style={styles.actionContainer}>
           <Pressable onPress={onEdit} style={styles.actionButton}>
@@ -123,7 +133,7 @@ export const SwipeableLocationItem = ({
       </View>
 
       <GestureDetector gesture={pan}>
-        <Animated.View
+        <AnimatedItem
           className="flex-1 bg-background justify-center overflow-hidden"
           style={animatedStyle}
         >
@@ -144,7 +154,7 @@ export const SwipeableLocationItem = ({
               <Text className="text-blue-500">Show on Map</Text>
             </Pressable>
           </View>
-        </Animated.View>
+        </AnimatedItem>
       </GestureDetector>
       <Separator />
     </View>

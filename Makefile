@@ -93,3 +93,6 @@ install-node:
 	@echo "Installing Node dependencies..."
 	npm install
 	@echo "Node dependencies installed"
+
+xcode:
+	cd ios && xed .

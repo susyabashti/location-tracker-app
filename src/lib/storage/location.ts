@@ -12,6 +12,12 @@ export type Location = {
   timestamp: number;
 };
 
+export type GetLocationPaginationResult = {
+  locations: Location[];
+  hasMore: boolean;
+  total: number;
+};
+
 type LocationsStore = {
   locations: Location[];
   lastLocation: Location | null;
@@ -28,6 +34,10 @@ type LocationsStore = {
   resetStationary: () => void;
   setHasSentNotification: (value: boolean) => void;
   setStationarySince: (timestamp: number) => void;
+  getLocationPagination: (
+    offset: number,
+    limit: number,
+  ) => GetLocationPaginationResult;
 };
 
 const INITIAL_STATE = {
@@ -39,7 +49,7 @@ const INITIAL_STATE = {
 
 export const locationStore = create<LocationsStore>()(
   persist(
-    set => ({
+    (set, getState) => ({
       ...INITIAL_STATE,
       addLocation: loc =>
         set(state => {
@@ -55,6 +65,23 @@ export const locationStore = create<LocationsStore>()(
             loc.id !== id ? loc : { ...loc, ...coords },
           ),
         })),
+      getLocationPagination: (offset = 0, limit = 20) => {
+        const locations = getState().locations;
+        const locationsCount = locations.length;
+        const actualOffset = Math.max(0, offset);
+        const actualLimit = Math.min(limit, locationsCount - actualOffset);
+        const paginatedLocations = locations.slice(
+          actualOffset,
+          actualOffset + actualLimit,
+        );
+        const hasMore = actualOffset + actualLimit < locationsCount;
+
+        return {
+          locations: paginatedLocations,
+          hasMore,
+          total: locationsCount,
+        };
+      },
       clearLocations: () => {
         storage.remove('locations');
         storage.remove('lastLocation');

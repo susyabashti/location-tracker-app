@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Alert, Keyboard, TouchableWithoutFeedback, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,19 +12,15 @@ export const EditModalScreen = ({
   navigation,
   route,
 }: RootStackScreenProps<'EditModal'>) => {
-  const { id, latitude, longitude } = route.params;
+  const { id, latitude, longitude, onSave, onCancel, preventDefaultGoBack } =
+    route.params;
+  const latInputRef = React.useRef<string>(latitude.toString());
+  const lonInputRef = React.useRef<string>(longitude.toString());
   const updateLocation = useLocationStore.use.updateLocation();
-  const [latInput, setLatInput] = useState(latitude.toString());
-  const [lonInput, setLonInput] = useState(longitude.toString());
-
-  useEffect(() => {
-    setLatInput(latitude.toString());
-    setLonInput(longitude.toString());
-  }, [latitude, longitude]);
 
   const handleConfirm = () => {
-    const newLat = parseFloat(latInput);
-    const newLon = parseFloat(lonInput);
+    const newLat = parseFloat(latInputRef.current);
+    const newLon = parseFloat(lonInputRef.current);
 
     if (isNaN(newLat) || isNaN(newLon)) {
       Alert.alert('Invalid input', 'Please enter valid coordinates.');
@@ -32,10 +28,18 @@ export const EditModalScreen = ({
     }
 
     updateLocation(id, { latitude: newLat, longitude: newLon });
+    onSave?.(newLon, newLat);
+
+    if (preventDefaultGoBack) return;
     navigation.goBack();
   };
 
   const handleCancel = () => {
+    onCancel?.();
+
+    if (preventDefaultGoBack) {
+      return;
+    }
     navigation.goBack();
   };
 
@@ -50,8 +54,10 @@ export const EditModalScreen = ({
             <View className="gap-2">
               <Label>Longitude</Label>
               <Input
-                value={lonInput}
-                onChangeText={setLonInput}
+                defaultValue={longitude.toString()}
+                onChangeText={text => {
+                  lonInputRef.current = text;
+                }}
                 placeholder="Longitude"
                 keyboardType="numeric"
               />
@@ -59,8 +65,10 @@ export const EditModalScreen = ({
             <View className="gap-2">
               <Label>Latitude</Label>
               <Input
-                value={latInput}
-                onChangeText={setLatInput}
+                defaultValue={latitude.toString()}
+                onChangeText={text => {
+                  latInputRef.current = text;
+                }}
                 placeholder="Latitude"
                 keyboardType="numeric"
               />
