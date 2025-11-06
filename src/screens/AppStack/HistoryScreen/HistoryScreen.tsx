@@ -7,11 +7,21 @@ import { useNavigation } from '@react-navigation/native';
 import { SwipeableListProvider } from './components/SwipeableListProvider';
 import { useLocationStore } from '@/lib/storage/location';
 import { Text } from '@/components/ui/text';
+import { useLocationPagination } from '@/lib/hooks/useLocationPagination';
+
+const LIMIT = 100;
 
 export const HistoryScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const locations = useLocationStore.use.locations();
+  const {
+    loadMore,
+    updateById,
+    deleteById,
+    itemsCount,
+    locations,
+    totalCount,
+  } = useLocationPagination({ perPage: LIMIT });
   const deleteLocation = useLocationStore.use.deleteLocation();
 
   const handleEdit = async (
@@ -19,11 +29,19 @@ export const HistoryScreen = () => {
     latitude: number,
     longitude: number,
   ) => {
-    navigation.navigate('EditModal', { id, latitude, longitude });
+    navigation.navigate('EditModal', {
+      id,
+      latitude,
+      longitude,
+      onSave: (long, lat) => {
+        updateById(id, { longitude: long, latitude: lat });
+      },
+    });
   };
 
   const handleDelete = async (id: string) => {
     deleteLocation(id);
+    deleteById(id);
   };
 
   return (
@@ -31,7 +49,7 @@ export const HistoryScreen = () => {
       className="flex-1 bg-background"
       style={{ paddingTop: insets.top + 16 }}
     >
-      {locations.length > 0 ? (
+      {itemsCount > 0 ? (
         <SwipeableListProvider>
           <FlashList
             data={locations}
@@ -40,6 +58,9 @@ export const HistoryScreen = () => {
               autoscrollToTopThreshold: 0.2,
               startRenderingFromBottom: false,
             }}
+            removeClippedSubviews={true}
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.6}
             renderItem={({ item }) => (
               <SwipeableLocationItem
                 id={item.id}
@@ -53,6 +74,11 @@ export const HistoryScreen = () => {
               />
             )}
           />
+          <View className="absolute bottom-2 right-4 bg-primary rounded-full px-3 py-1 z-10">
+            <Text className="text-white text-sm font-medium">
+              {itemsCount} / {totalCount}
+            </Text>
+          </View>
         </SwipeableListProvider>
       ) : (
         <View className="flex-1 justify-center items-center">

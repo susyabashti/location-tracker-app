@@ -7,7 +7,14 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 export type RootStackParamList = {
   App: NavigatorScreenParams<AppTabParamList>;
-  EditModal: { id: string; longitude: number; latitude: number };
+  EditModal: {
+    id: string;
+    longitude: number;
+    latitude: number;
+    onSave?: (longitude: number, latitude: number) => void;
+    onCancel?: () => void;
+    preventDefaultGoBack?: boolean;
+  };
 };
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
